@@ -188,8 +188,14 @@ RUN set -ex && \
     rm -rf /var/lib/apt
 COPY --from=builder /src/build/release/bin /usr/local/bin/
 
+# Create haven user
+RUN adduser --system --group --disabled-password haven && \
+	mkdir -p /wallet /home/haven/.haven && \
+	chown -R haven:haven /home/haven/.haven && \
+	chown -R haven:haven /wallet
+
 # Contains the blockchain
-VOLUME /root/.haven
+VOLUME /home/haven/.haven
 
 # Generate your wallet via accessing the container and run:
 # cd /wallet
@@ -207,4 +213,3 @@ WORKDIR /wallet
 USER haven
 
 ENTRYPOINT ["havend", "--p2p-bind-ip=0.0.0.0", "--rpc-bind-ip=0.0.0.0", "--non-interactive", "--confirm-external-bind"]
-
