@@ -331,3 +331,5 @@ target_link_libraries(blockchain_prune
     ${Boost_THREAD_LIBRARY}
     ${CMAKE_THREAD_LIBS_INIT}
     ${EXTRA_LIBRARIES})
+
+add_definitions(-D__STDC_FORMAT_MACROS)
