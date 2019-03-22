@@ -121,7 +121,12 @@ namespace cryptonote
     keypair gov_key = get_deterministic_keypair_from_height(height);
 
     cryptonote::address_parse_info governance_wallet_address;
-    cryptonote::get_account_address_from_str(governance_wallet_address, MAINNET, governance_wallet_address_str);
+
+    if (testnet) {
+      cryptonote::get_account_address_from_str(governance_wallet_address, TESTNET, governance_wallet_address_str); 
+    } else {
+      cryptonote::get_account_address_from_str(governance_wallet_address, MAINNET, governance_wallet_address_str);
+    }
 
     crypto::public_key correct_key;
 
@@ -201,12 +206,20 @@ namespace cryptonote
 
         cryptonote::address_parse_info governance_wallet_address;
 
-        if (testnet) {
-          cryptonote::get_account_address_from_str(governance_wallet_address, TESTNET, ::config::testnet::GOVERNANCE_WALLET_ADDRESS);
+        if (hard_fork_version >= 4) {
+          // shouts to sebseb7
+          if (testnet) {
+            cryptonote::get_account_address_from_str(governance_wallet_address, TESTNET, ::config::testnet::GOVERNANCE_WALLET_ADDRESS_MULTI);
+          } else {
+            cryptonote::get_account_address_from_str(governance_wallet_address, MAINNET, ::config::GOVERNANCE_WALLET_ADDRESS_MULTI);
+          }
         } else {
-          cryptonote::get_account_address_from_str(governance_wallet_address, MAINNET, ::config::GOVERNANCE_WALLET_ADDRESS);
+          if (testnet) {
+            cryptonote::get_account_address_from_str(governance_wallet_address, TESTNET, ::config::testnet::GOVERNANCE_WALLET_ADDRESS);
+          } else {
+            cryptonote::get_account_address_from_str(governance_wallet_address, MAINNET, ::config::GOVERNANCE_WALLET_ADDRESS);
+          }
         }
-
 
         crypto::public_key out_eph_public_key = AUTO_VAL_INIT(out_eph_public_key);
 
