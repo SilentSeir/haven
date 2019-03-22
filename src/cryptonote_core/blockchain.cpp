@@ -89,7 +89,8 @@ static const struct {
   { 1, 1, 0, 1517398427 },
   { 2, 38500, 0, 1522818000 },  // 4th April 2018
   { 3, 89200, 0, 1528942500 },  // 14th June 2018
-  { 4, 290587, 0, 1553112000 }  // 20th March 2019 ~20:00 GMT
+  { 4, 290587, 0, 1553112000 },  // 20th March 2019 ~20:00 GMT
+  { 5, 300000, 0, 1553112000 }
 };
 static const uint64_t mainnet_hard_fork_version_1_till = 1009826;
 
@@ -103,7 +104,8 @@ static const struct {
   { 1, 1, 0, 1517398420 },
   { 2, 25, 0, 1522713600 },
   { 3, 50, 0, 1528489596 },
-  { 4, 75, 0, 1552960800 }
+  { 4, 75, 0, 1552960800 },
+  { 5, 100, 0, 1552960800 }
 };
 static const uint64_t testnet_hard_fork_version_1_till = 624633;
 
@@ -2447,8 +2449,8 @@ bool Blockchain::check_tx_outputs(const transaction& tx, tx_verification_context
     }
   }
 
-  // from v4, forbid invalid pubkeys
-  if (hf_version >= 4) {
+  // from v5, forbid invalid pubkeys
+  if (hf_version >= 5) {
     for (const auto &o: tx.vout) {
       if (o.target.type() == typeid(txout_to_key)) {
         const txout_to_key& out_to_key = boost::get<txout_to_key>(o.target);
@@ -2460,13 +2462,13 @@ bool Blockchain::check_tx_outputs(const transaction& tx, tx_verification_context
     }
   }
 
-  // from v4, allow bulletproofs
-  if (hf_version < 4) {
+  // from v5, allow bulletproofs
+  if (hf_version < 5) {
     if (tx.version >= 2) {
       const bool bulletproof = rct::is_rct_bulletproof(tx.rct_signatures.type);
       if (bulletproof || !tx.rct_signatures.p.bulletproofs.empty())
       {
-        MERROR_VER("Bulletproofs are not allowed before v4");
+        MERROR_VER("Bulletproofs are not allowed before v5");
         tvc.m_invalid_output = true;
         return false;
       }
