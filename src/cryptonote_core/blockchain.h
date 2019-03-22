@@ -569,8 +569,8 @@ namespace cryptonote
      * @brief get dynamic per kB or byte fee for a given block weight
      *
      * The dynamic fee is based on the block weight in a past window, and
-     * the current block reward. It is expressed by kB before v8, and
-     * per byte from v8.
+     * the current block reward. It is expressed by kB before v5, and
+     * per byte from v5.
      *
      * @param block_reward the current block reward
      * @param median_block_weight the median block weight in the past window
@@ -584,8 +584,8 @@ namespace cryptonote
      * @brief get dynamic per kB or byte fee estimate for the next few blocks
      *
      * The dynamic fee is based on the block weight in a past window, and
-     * the current block reward. It is expressed by kB before v8, and
-     * per byte from v8.
+     * the current block reward. It is expressed by kB before v5, and
+     * per byte from v5.
      * This function calculates an estimate for a dynamic fee which will be
      * valid for the next grace_blocks
      *

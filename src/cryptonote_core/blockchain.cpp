@@ -91,9 +91,10 @@ static const struct {
   { 1, 1, 0, 1517398427 },
   { 2, 38500, 0, 1522818000 },  // 4th April 2018
   { 3, 89200, 0, 1528942500 },  // 14th June 2018
-  { 4, 290587, 0, 1553112000 }  // 20th March 2019 ~20:00 GMT
+  { 4, 290587, 0, 1553112000 },  // 20th March 2019 ~20:00 GMT
+  { 5, 318921, 0, 1556747445 }
 };
-static const uint64_t mainnet_hard_fork_version_1_till = 1009826;
+static const uint64_t mainnet_hard_fork_version_1_till = 0;
 
 static const struct {
   uint8_t version;
@@ -105,9 +106,10 @@ static const struct {
   { 1, 1, 0, 1517398420 },
   { 2, 25, 0, 1522713600 },
   { 3, 50, 0, 1528489596 },
-  { 4, 75, 0, 1552960800 }
+  { 4, 75, 0, 1552960800 },
+  { 5, 100, 0, 1552980800 }
 };
-static const uint64_t testnet_hard_fork_version_1_till = 624633;
+static const uint64_t testnet_hard_fork_version_1_till = 0;
 
 static const struct {
   uint8_t version;
@@ -1891,14 +1893,14 @@ void Blockchain::get_output_key_mask_unlocked(const uint64_t& amount, const uint
 //------------------------------------------------------------------
 bool Blockchain::get_output_distribution(uint64_t amount, uint64_t from_height, uint64_t to_height, uint64_t &start_height, std::vector<uint64_t> &distribution, uint64_t &base) const
 {
-  // rct outputs don't exist before v4
+  // rct outputs don't exist before v5
   if (amount == 0)
   {
     switch (m_nettype)
     {
-      case STAGENET: start_height = stagenet_hard_forks[3].height; break;
-      case TESTNET: start_height = testnet_hard_forks[3].height; break;
-      case MAINNET: start_height = mainnet_hard_forks[3].height; break;
+      case STAGENET: start_height = stagenet_hard_forks[4].height; break;
+      case TESTNET: start_height = testnet_hard_forks[4].height; break;
+      case MAINNET: start_height = mainnet_hard_forks[4].height; break;
       case FAKECHAIN: start_height = 0; break;
       default: return false;
     }
@@ -2510,8 +2512,8 @@ bool Blockchain::check_tx_outputs(const transaction& tx, tx_verification_context
     }
   }
 
-  // from v4, forbid invalid pubkeys
-  if (hf_version >= 4) {
+  // from v5, forbid invalid pubkeys
+  if (hf_version >= 5) {
     for (const auto &o: tx.vout) {
       if (o.target.type() == typeid(txout_to_key)) {
         const txout_to_key& out_to_key = boost::get<txout_to_key>(o.target);
@@ -2523,38 +2525,38 @@ bool Blockchain::check_tx_outputs(const transaction& tx, tx_verification_context
     }
   }
 
-  // from v4, allow bulletproofs
-  if (hf_version < 4) {
+  // from v5, allow bulletproofs
+  if (hf_version < 5) {
     if (tx.version >= 2) {
       const bool bulletproof = rct::is_rct_bulletproof(tx.rct_signatures.type);
       if (bulletproof || !tx.rct_signatures.p.bulletproofs.empty())
       {
-        MERROR_VER("Bulletproofs are not allowed before v4");
+        MERROR_VER("Bulletproofs are not allowed before v5");
         tvc.m_invalid_output = true;
         return false;
       }
     }
   }
 
-  // from v9, forbid borromean range proofs
-  if (hf_version > 8) {
+  // from v5, forbid borromean range proofs
+  if (hf_version > 5) {
     if (tx.version >= 2) {
       const bool borromean = rct::is_rct_borromean(tx.rct_signatures.type);
       if (borromean)
       {
-        MERROR_VER("Borromean range proofs are not allowed after v8");
+        MERROR_VER("Borromean range proofs are not allowed after v5");
         tvc.m_invalid_output = true;
         return false;
       }
     }
   }
 
-  // from v10, allow bulletproofs v2
-  if (hf_version < HF_VERSION_SMALLER_BP) {
+  // from v5, allow bulletproofs v2
+  if (hf_version < 5) {
     if (tx.version >= 2) {
       if (tx.rct_signatures.type == rct::RCTTypeBulletproof2)
       {
-        MERROR_VER("Bulletproofs v2 are not allowed before v" << HF_VERSION_SMALLER_BP);
+        MERROR_VER("Bulletproofs v2 are not allowed before v5");
         tvc.m_invalid_output = true;
         return false;
       }
@@ -3022,16 +3024,16 @@ bool Blockchain::check_tx_inputs(transaction& tx, tx_verification_context &tvc, 
       return false;
     }
 
-    // for bulletproofs, check they're only multi-output after v8
+    // for bulletproofs, check they're only multi-output after v5
     if (rct::is_rct_bulletproof(rv.type))
     {
-      if (hf_version < 8)
+      if (hf_version < 5)
       {
         for (const rct::Bulletproof &proof: rv.p.bulletproofs)
         {
           if (proof.V.size() > 1)
           {
-            MERROR_VER("Multi output bulletproofs are invalid before v8");
+            MERROR_VER("Multi output bulletproofs are invalid before v5");
             return false;
           }
         }
@@ -3741,9 +3743,9 @@ leave:
 bool Blockchain::prune_blockchain(uint32_t pruning_seed)
 {
   uint8_t hf_version = m_hardfork->get_current_version();
-  if (hf_version < 10)
+  if (hf_version < 5)
   {
-    MERROR("Most of the network will only be ready for pruned blockchains from v10, not pruning");
+    MERROR("Most of the network will only be ready for pruned blockchains from v5, not pruning");
     return false;
   }
   return m_db->prune_blockchain(pruning_seed);
