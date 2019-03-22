@@ -90,7 +90,8 @@ static const struct {
   // version 1 from the start of the blockchain
   { 1, 1, 0, 1517398427 },
   { 2, 38500, 0, 1522818000 },  // 4th April 2018
-  { 3, 89200, 0, 1528942500 }   // 14th June 2018
+  { 3, 89200, 0, 1528942500 },  // 14th June 2018
+  { 4, 290587, 0, 1553112000 }  // 20th March 2019 ~20:00 GMT
 };
 static const uint64_t mainnet_hard_fork_version_1_till = 1009826;
 
@@ -102,8 +103,9 @@ static const struct {
 } testnet_hard_forks[] = {
   // version 1 from the start of the blockchain
   { 1, 1, 0, 1517398420 },
-  { 2, 2510, 0, 1522713600 },
-  { 3, 2600, 0, 1528489596 }
+  { 2, 25, 0, 1522713600 },
+  { 3, 50, 0, 1528489596 },
+  { 4, 75, 0, 1552960800 }
 };
 static const uint64_t testnet_hard_fork_version_1_till = 624633;
 
@@ -1195,10 +1197,19 @@ bool Blockchain::validate_miner_transaction(const block& b, size_t cumulative_bl
       }
 
       std::string governance_wallet_address_str;
-      if (m_nettype == TESTNET) {
-        governance_wallet_address_str = ::config::testnet::GOVERNANCE_WALLET_ADDRESS;
+
+      if (version >= 4) {
+        if (m_nettype == TESTNET) {
+          governance_wallet_address_str = ::config::testnet::GOVERNANCE_WALLET_ADDRESS_MULTI;
+	} else {
+          governance_wallet_address_str = ::config::GOVERNANCE_WALLET_ADDRESS_MULTI;
+	}
       } else {
-        governance_wallet_address_str = ::config::GOVERNANCE_WALLET_ADDRESS;
+        if (m_nettype == TESTNET) {
+          governance_wallet_address_str = ::config::testnet::GOVERNANCE_WALLET_ADDRESS;
+        } else {
+          governance_wallet_address_str = ::config::GOVERNANCE_WALLET_ADDRESS;
+        }
       }
 
       if (!validate_governance_reward_key(m_db->height(), governance_wallet_address_str, b.miner_tx.vout.size() - 1, boost::get<txout_to_key>(b.miner_tx.vout.back().target).key, m_nettype == TESTNET))
