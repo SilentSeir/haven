@@ -195,6 +195,8 @@ VOLUME /wallet
 
 EXPOSE 17749
 EXPOSE 17750
+EXPOSE 27750
+EXPOSE 27750
 
-ENTRYPOINT ["havend", "--p2p-bind-ip=0.0.0.0", "--p2p-bind-port=17749", "--rpc-bind-ip=0.0.0.0", "--rpc-bind-port=17750", "--non-interactive", "--confirm-external-bind"]
+ENTRYPOINT ["havend", "--p2p-bind-ip=0.0.0.0", "--rpc-bind-ip=0.0.0.0", "--non-interactive", "--confirm-external-bind"]
 
