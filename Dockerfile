@@ -201,5 +201,10 @@ EXPOSE 17750
 EXPOSE 27749
 EXPOSE 27750
 
+WORKDIR /wallet
+
+# switch to user haven
+USER haven
+
 ENTRYPOINT ["havend", "--p2p-bind-ip=0.0.0.0", "--rpc-bind-ip=0.0.0.0", "--non-interactive", "--confirm-external-bind"]
 
