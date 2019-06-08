@@ -3230,6 +3230,9 @@ namespace tools
       }
     }
 
+    // NEAC - added to set language in newly-recreated wallet file
+    wal->set_seed_language(req.language);
+      
     try
     {
       if (!req.spendkey.empty())
