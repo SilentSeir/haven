@@ -2130,6 +2130,7 @@ namespace wallet_rpc
       std::string spendkey;
       std::string viewkey;
       std::string password;
+      std::string language;
       bool autosave_current;
 
       BEGIN_KV_SERIALIZE_MAP()
@@ -2139,6 +2140,7 @@ namespace wallet_rpc
       KV_SERIALIZE(spendkey)
       KV_SERIALIZE(viewkey)
       KV_SERIALIZE(password)
+      KV_SERIALIZE(language)
       KV_SERIALIZE_OPT(autosave_current, true)
       END_KV_SERIALIZE_MAP()
     };
