@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2018, The Monero Project
+// Copyright (c) 2014-2019, The Monero Project
 //
 // All rights reserved.
 //
@@ -197,7 +197,7 @@ namespace cryptonote
       *
       * @return true if the block was added to the main chain, otherwise false
       */
-     virtual bool handle_block_found( block& b);
+     virtual bool handle_block_found(block& b, block_verification_context &bvc);
 
      /**
       * @copydoc Blockchain::create_block_template
