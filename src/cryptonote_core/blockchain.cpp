@@ -92,7 +92,7 @@ static const struct {
   { 2, 38500, 0, 1522818000 },  // 4th April 2018
   { 3, 89200, 0, 1528942500 },  // 14th June 2018
   { 4, 290587, 0, 1553112000 },  // 20th March 2019 ~20:00 GMT
-  { 5, 318921, 0, 1556747445 }
+  { 5, 356338, 0, 1561060800 }  // 20th June 2019 - 20:00 GMT
 };
 static const uint64_t mainnet_hard_fork_version_1_till = 0;
 
@@ -834,7 +834,7 @@ difficulty_type Blockchain::get_difficulty_for_next_block()
   std::vector<uint64_t> timestamps;
   std::vector<difficulty_type> difficulties;
   auto height = m_db->height();
-  
+
   uint8_t version = get_current_hard_fork_version();
   size_t difficulty_blocks_count;
   if (version == 1) {
@@ -842,7 +842,7 @@ difficulty_type Blockchain::get_difficulty_for_next_block()
   } else {
     difficulty_blocks_count = DIFFICULTY_BLOCKS_COUNT_V2;
   }
-  
+
   top_hash = get_tail_id(); // get it again now that we have the lock
   // ND: Speedup
   // 1. Keep a list of the last 735 (or less) blocks that is used to compute difficulty,
@@ -888,7 +888,7 @@ difficulty_type Blockchain::get_difficulty_for_next_block()
     m_difficulties = difficulties;
   }
   size_t target = get_difficulty_target();
-  
+
   difficulty_type diff;
   if (version == 1) {
     diff = next_difficulty(timestamps, difficulties, target);
@@ -1068,7 +1068,7 @@ difficulty_type Blockchain::get_next_difficulty_for_alternative_chain(const std:
   LOG_PRINT_L3("Blockchain::" << __func__);
   std::vector<uint64_t> timestamps;
   std::vector<difficulty_type> cumulative_difficulties;
-  
+
   uint8_t version = get_current_hard_fork_version();
   size_t difficulty_blocks_count;
   if (version == 1) {
@@ -1186,7 +1186,7 @@ bool Blockchain::validate_miner_transaction(const block& b, size_t cumulative_bl
     MERROR_VER("block weight " << cumulative_block_weight << " is bigger than allowed for this blockchain");
     return false;
   }
-  
+
   if (version >= 3) {
     if (already_generated_coins != 0)
     {
@@ -1221,7 +1221,7 @@ bool Blockchain::validate_miner_transaction(const block& b, size_t cumulative_bl
       }
     }
   }
-  
+
   if(base_reward + fee < money_in_use)
   {
     MERROR_VER("coinbase transaction spend too much money (" << print_money(money_in_use) << "). Block reward is " << print_money(base_reward + fee) << "(" << print_money(base_reward) << "+" << print_money(fee) << ")");
@@ -1326,7 +1326,7 @@ bool Blockchain::create_block_template(block& b, const account_public_address& m
   b.minor_version = m_hardfork->get_ideal_version();
   b.prev_id = get_tail_id();
   b.timestamp = time(NULL);
-  
+
   uint8_t version = get_current_hard_fork_version();
   uint64_t blockchain_timestamp_check_window = BLOCKCHAIN_TIMESTAMP_CHECK_WINDOW;
 
