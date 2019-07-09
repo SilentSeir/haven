@@ -2677,6 +2677,15 @@ bool Blockchain::check_tx_inputs(transaction& tx, tx_verification_context &tvc, 
 
   const uint8_t hf_version = m_hardfork->get_current_version();
 
+  if ((hf_version >= HF_VERSION_MIN_MIXIN_10) && (get_current_blockchain_height() > 369770)) {
+    if (tx.vin.size() > MAX_INPUTS_PER_TX) {
+      MERROR_VER("Tx " << get_transaction_hash(tx) << " has too many inputs (" << (tx.vin.size()) << "), it should be " << MAX_INPUTS_PER_TX);
+      tvc.m_verifivation_failed = true;
+      tvc.m_too_big = true;
+      return false;
+    }
+  }
+  
   // from hard fork 2, we require mixin at least 2 unless one output cannot mix with 2 others
   // if one output cannot mix with 2 others, we accept at most 1 output that can mix
   if (hf_version >= 2)

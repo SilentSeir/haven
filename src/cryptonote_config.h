@@ -148,6 +148,7 @@
 #define HF_VERSION_ENFORCE_RCT                  5
 #define HF_VERSION_PER_BYTE_FEE                 5
 #define HF_VERSION_SMALLER_BP                   5
+#define MAX_INPUTS_PER_TX                       150
 
 #define PER_KB_FEE_QUANTIZATION_DECIMALS        8
 
